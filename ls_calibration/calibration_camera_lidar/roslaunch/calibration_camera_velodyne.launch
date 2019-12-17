@@ -1,0 +1,16 @@
+
+<launch>
+
+    <arg name="velodyne_sub_topic" default="/vlp32_0/velodyne_points" />
+    <arg name="velodyne_pub_topic" default="/vlp32_0/pc_transformed" />
+    <arg name="source_frame" default="lidar_left" />
+
+    <node pkg="transform_pointcloud" type="transform_pointcloud_node" name="transform_pointcloud_node" output="screen" >
+        <param name="velodyne_sub_topic" value="$(arg velodyne_sub_topic)" />
+        <param name="velodyne_pub_topic" value="$(arg velodyne_pub_topic)" />
+        <param name="source_frame" value="$(arg source_frame)" />
+    </node>
+
+    <node pkg="calibration_camera_lidar" type="calibration_toolkit" name="calibration_toolkit" output="screen" />
+
+</launch>

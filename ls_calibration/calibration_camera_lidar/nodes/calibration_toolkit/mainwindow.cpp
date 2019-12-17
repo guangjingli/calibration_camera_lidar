@@ -53,6 +53,7 @@ MainWindow::MainWindow(QWidget *parent) :
     }
 
     QString inputcameratopic=QInputDialog::getItem(this, "Select Input", "Select Input Image Topic", items);
+    QString inputvelodynetopic=QInputDialog::getItem(this, "Select Velodyne Input", "Select Input Velodyne Topic", items);
     QString selection=QInputDialog::getItem(this,"Choose Calibration Type", "Calibration Type",QStringList()<<CALIBCAMERA<<CALIBCAMERAVELODYNE<<CALIBCAMERA2DLIDAR,0,0);
 
     QSettings settings("RobotSDK","CalibrationToolkit");
@@ -84,7 +85,7 @@ MainWindow::MainWindow(QWidget *parent) :
     else if(selection==CALIBCAMERAVELODYNE)
     {
         QString cameratopic=inputcameratopic;
-        QString velodynetopic="/points_raw";
+        QString velodynetopic=inputvelodynetopic;
         CalibrateCameraVelodyneChessboardROS * calibration=new CalibrateCameraVelodyneChessboardROS(cameratopic,1000,10,velodynetopic,1000,10,100,cvpatternsize,cvpatternnum);
         ui->tabWidget->addTab(calibration,CALIBCAMERAVELODYNE);
         connect(ui->grab,SIGNAL(clicked()),calibration,SLOT(grabCalibDataSlot()));

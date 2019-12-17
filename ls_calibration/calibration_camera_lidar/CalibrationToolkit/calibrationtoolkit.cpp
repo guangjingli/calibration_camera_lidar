@@ -705,10 +705,17 @@ bool CalibrateCameraVelodyneChessboardBase::refreshVelodyne()
     for(i=0;i<n;i++)
     {
         float * base=(float *)(data+i*calibvelodyne->point_step);
-        colors[i*3+0]=base[4]/255.0;
-        colors[i*3+1]=base[4]/255.0;
-        colors[i*3+2]=base[4]/255.0;
+//        colors[i*3+0]=base[4]/255.0;
+//        colors[i*3+1]=base[4]/255.0;
+//        colors[i*3+2]=base[4]/255.0;
+        colors[i*3+0]= 0.0;
+        colors[i*3+1]= 0.0;
+        colors[i*3+2]= 0.0;
     }
+
+    //// 白色
+//    glClearColor(1.0, 1.0, 1.0, 1.0);
+//    glClear(GL_COLOR_BUFFER_BIT);
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);

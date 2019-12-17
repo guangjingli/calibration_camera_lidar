@@ -17,6 +17,7 @@
 #include<qframe.h>
 #include<qmessagebox.h>
 #include<qcombobox.h>
+#include<ros/ros.h>
 
 #include<opencv2/opencv.hpp>
 
