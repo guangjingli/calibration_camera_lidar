@@ -1,0 +1,34 @@
+<launch>
+    <arg name="extrinsic_path" default="/home/lgj/workspace/calibration_ws/extrinsic2.yaml" />
+    <arg name="velodyne_left_sub_topic" default="/vlp32_0/velodyne_points" />
+    <arg name="velodyne_right_sub_topic" default="/vlp32_2/velodyne_points" />
+    <arg name="velodyne_left_pub_topic" default="/vlp32_0/pc_transformed" />
+    <arg name="velodyne_right_pub_topic" default="/vlp32_2/pc_transformed" />
+    <arg name="left_source_frame" default="lidar_left" />
+    <arg name="right_source_frame" default="lidar_right" />
+
+    <node pkg="project_pointcloud" type="project_pointcloud_node" name="project_pointcloud_node" output="screen" >
+        <param name="topic_left_sub" value="$(arg velodyne_left_pub_topic)" />
+        <param name="topic_right_sub" value="$(arg velodyne_right_pub_topic)" />
+        <param name="extrinsic_path" value="$(arg extrinsic_path)" />
+    </node>
+
+    <group ns="left_velodyne">
+        <node pkg="transform_pointcloud" type="transform_pointcloud_node" name="transform_pointcloud_node" output="screen" >
+            <param name="velodyne_sub_topic" value="$(arg velodyne_left_sub_topic)" />
+            <param name="velodyne_pub_topic" value="$(arg velodyne_left_pub_topic)" />
+            <param name="source_frame" value="$(arg left_source_frame)" />
+        </node>
+    </group>
+
+    <group ns="right_velodyne">
+        <node pkg="transform_pointcloud" type="transform_pointcloud_node" name="transform_pointcloud_node" output="screen" >
+            <param name="velodyne_sub_topic" value="$(arg velodyne_right_sub_topic)" />
+            <param name="velodyne_pub_topic" value="$(arg velodyne_right_pub_topic)" />
+            <param name="source_frame" value="$(arg right_source_frame)" />
+        </node>
+    </group>
+
+
+
+</launch>

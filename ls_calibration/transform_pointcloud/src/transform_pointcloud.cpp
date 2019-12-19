@@ -26,8 +26,8 @@ void tfStaticCallback(const geometry_msgs::TransformStamped& tf){
     );
     is_calibrated_ = true;
     char text[1024];
-    sprintf(text, "received the tf msg frame_id =%s,child_frame_id =%s:yaw=%1.2f, pitch=%1.2f, roll=%1.2f, x=%1.2f, y=%1.2f, z=%1.2f",
-            std::string(tf.header.frame_id), std::string(tf.child_frame_id),
+    sprintf(text, "received the source_frame %s:yaw=%1.2f, pitch=%1.2f, roll=%1.2f, x=%1.2f, y=%1.2f, z=%1.2f",
+            source_frame.c_str(),
             yaw * degree_per_rad, pitch * degree_per_rad, roll * degree_per_rad,
             tf.transform.translation.x,
             tf.transform.translation.y,
@@ -105,6 +105,11 @@ int main(int argc, char** argv){
     std::string velodyne_topic = pnh.param("velodyne_sub_topic", std::string("/vlp32_0/velodyne_points"));
     std::string velodyne_publish_topic = pnh.param("velodyne_pub_topic", std::string("/vlp32_0/pc_transformed"));
     source_frame = pnh.param("source_frame", std::string("lidar_left"));
+
+
+    std::cout << "topic_sub: " << velodyne_topic << std::endl;
+    std::cout << "velodyne_publish_topic: " << velodyne_publish_topic << std::endl;
+    std::cout << "source_frame: " << source_frame << std::endl << std::endl;
 
     publisher_pc = pnh.advertise<sensor_msgs::PointCloud2>(velodyne_publish_topic, 2);
     ros::Subscriber pc_sub_ = pnh.subscribe(velodyne_topic, 2, callback);
