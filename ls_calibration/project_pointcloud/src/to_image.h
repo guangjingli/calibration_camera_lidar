@@ -15,7 +15,14 @@ typedef pcl::PointXYZI PointType;
 typedef pcl::PointCloud<PointType> PointCloud;
 typedef pcl::PointCloud<PointType>::Ptr PointCloudPtr;
 
-
+struct ExtrinsicConfig{
+    double yaw;
+    double pitch;
+    double roll;
+    double z;
+    double y;
+    double x;
+};
 
 class ToImage{
 public:
@@ -27,6 +34,8 @@ public:
             const PointType& point_in,
             Eigen::Vector3d& point_image
             );
+
+    void adjust_extrinsic(ExtrinsicConfig config);
 
     void pointcloud2image(
             const PointCloud& point_cloud,

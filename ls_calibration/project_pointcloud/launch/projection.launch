@@ -1,5 +1,9 @@
 <launch>
-    <arg name="extrinsic_path" default="/home/lgj/workspace/calibration_ws/extrinsic2.yaml" />
+    <arg name="x_adjust" default="0.0" />
+    <arg name="y_adjust" default="0.0" />
+    <arg name="z_adjust" default="0.0" />
+
+    <arg name="extrinsic_path" default="/home/lgj/workspace/calibration_ws/extrinsic_adjust.yaml" />
     <arg name="velodyne_left_sub_topic" default="/vlp32_0/velodyne_points" />
     <arg name="velodyne_right_sub_topic" default="/vlp32_2/velodyne_points" />
     <arg name="topic_image_sub" default="/darknet_ros/detection_visualization" />
@@ -13,6 +17,11 @@
         <param name="extrinsic_path" value="$(arg extrinsic_path)" />
         <param name="left_source_frame" value="$(arg left_source_frame)" />
         <param name="right_source_frame" value="$(arg right_source_frame)" />
+        <param name="x_adjust" value="$(arg x_adjust)" />
+        <param name="y_adjust" value="$(arg y_adjust)" />
+        <param name="z_adjust" value="$(arg z_adjust)" />
     </node>
+
+    <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="rqt_reconfigure" output="screen" />
 
 </launch>

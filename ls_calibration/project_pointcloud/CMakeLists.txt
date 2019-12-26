@@ -12,11 +12,13 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   tf
+        message_generation
         pcl_conversions
         pcl_ros
         std_msgs
         sensor_msgs
         cv_bridge
+        dynamic_reconfigure
 )
 
 ## System dependencies are found with CMake's conventions
@@ -24,7 +26,13 @@ find_package(OpenCV REQUIRED)
 find_package(PCL REQUIRED)
 find_package(Eigen3 REQUIRED)
 
+generate_dynamic_reconfigure_options(
+        cfg/adjust_extrinsic.cfg
+)
+
+
 catkin_package(
+        CATKIN_DEPENDS rospy
 )
 
 include_directories(
@@ -40,12 +48,14 @@ add_executable(project_pointcloud_node
         src/utils.cpp
         )
 
+add_dependencies(project_pointcloud_node project_pointcloud_gencfg ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+
 target_link_libraries(project_pointcloud_node
         ${catkin_LIBRARIES}
         ${PCL_LIBRARY_DIRS}
         ${OpenCV_LIBS}
         )
-
 
 
 add_executable(test_node

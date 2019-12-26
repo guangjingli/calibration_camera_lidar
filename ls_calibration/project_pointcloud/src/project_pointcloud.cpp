@@ -14,6 +14,8 @@
 #include <sensor_msgs/image_encodings.h>
 #include <sensor_msgs/Image.h>
 #include <pcl_conversions/pcl_conversions.h>
+#include <dynamic_reconfigure/server.h>
+#include <project_pointcloud/adjust_Config.h>
 
 std::string left_source_frame = "lidar_left";
 std::string right_source_frame = "lidar_right";
@@ -29,6 +31,7 @@ cv::Mat lidar_left_extrinsic_;
 cv::Mat lidar_right_extrinsic_;
 tf2_ros::Buffer tfBuffer_;
 
+ExtrinsicConfig config_;
 ToImage to_image_;
 
 void tfStaticCallback(const geometry_msgs::TransformStamped& tf,
@@ -93,6 +96,7 @@ int projectPoints2Image(const sensor_msgs::PointCloud2ConstPtr pointMsg,
     std::cout << source_frame << "_time - image_time = " << time_diff << std::endl;
 
     std::vector<Eigen::Vector3d> points_image;
+    to_image_.adjust_extrinsic(config_);
     to_image_.pointcloud2image(points, points_image);
 
     for(size_t i = 0; i < points_image.size(); ++i){
@@ -129,6 +133,17 @@ void imageCallback(const sensor_msgs::ImageConstPtr &imageMsg){
     isImage = true;
 }
 
+void dynamicConfigCallback(project_pointcloud::adjust_Config &config, uint32_t level){
+    config_.x = config.x_adjust;
+    config_.y = config.y_adjust;
+    config_.z = config.z_adjust;
+    config_.roll = config.roll_adjust;
+    config_.pitch = config.pitch_adjust;
+    config_.yaw = config.yaw_adjust;
+
+}
+
+
 int main(int argc, char** argv){
     ros::init(argc, argv, "project_pointcloud_node");
     ros::NodeHandle nh;
@@ -139,16 +154,23 @@ int main(int argc, char** argv){
 
     std::string topic_left_sub = pnh.param("topic_left_sub", std::string("/vlp32_0/velodyne_points"));
     std::string topic_right_sub = pnh.param("topic_right_sub", std::string("/vlp32_2/velodyne_points"));
-    std::string topic_image_sub = pnh.param("topic_image_sub", std::string("/dev/video0"));
+    std::string topic_image_sub = pnh.param("topic_image_sub", std::string("/darknet_ros/detection_visualization"));
     std::cout << topic_left_sub << "\t" << topic_right_sub << "\t" << topic_image_sub << std::endl;
 
     left_source_frame = pnh.param("left_source_frame", std::string("lidar_left"));
     right_source_frame = pnh.param("right_source_frame", std::string("lidar_right"));
 
+
     to_image_.doInit(extrinsic_path);
 
     publisher_left = nh.advertise<sensor_msgs::Image>("vlp32_0/image", 5);
     publisher_right = nh.advertise<sensor_msgs::Image>("vlp32_2/image", 5);
+
+    dynamic_reconfigure::Server<project_pointcloud::adjust_Config> server;
+    dynamic_reconfigure::Server<project_pointcloud::adjust_Config>::CallbackType f;
+    f = boost::bind(&dynamicConfigCallback, _1, _2);
+    server.setCallback(f);
+
 
     while(!(left_is_calibrated_ && right_is_calibrated_)){
         tf2_ros::TransformListener tfStaticListener(tfBuffer_);
@@ -172,6 +194,8 @@ int main(int argc, char** argv){
             }
         }
     }
+
+
 
     ros::Subscriber subImage = nh.subscribe<sensor_msgs::Image>(topic_image_sub, 5, imageCallback);
     ros::Subscriber subPointsLeft = nh.subscribe<sensor_msgs::PointCloud2>(topic_left_sub, 5, velodyneLeftCallback);
